@@ -887,7 +887,8 @@
         </div>
 
         <div class="contact-form reveal reveal-delay-2">
-          <form id="contactForm" novalidate>
+          <form id="contactForm" action="https://formspree.io/f/mykakpzg" method="POST">
+            <input type="hidden" name="_subject" value="New message from certivonit.ca" />
             <div class="form-group">
               <label for="name">Name</label>
               <input type="text" id="name" name="name" placeholder="Your full name" required />
@@ -965,24 +966,6 @@
       setTimeout(() => el.classList.add('visible'), 100);
     });
 
-    // ── Contact form (client-side only demo)
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const message = document.getElementById('message').value.trim();
-      if (!name || !email || !message) return;
-
-      const btn = this.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      btn.textContent = 'Sending…';
-
-      setTimeout(() => {
-        document.getElementById('formSuccess').style.display = 'block';
-        btn.style.display = 'none';
-        this.reset();
-      }, 900);
-    });
   </script>
 </body>
 </html>
