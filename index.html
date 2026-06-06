@@ -621,13 +621,26 @@
       font-size: 15px;
     }
 
-    .form-success {
+    .form-feedback {
       display: none;
       text-align: center;
-      padding: 24px 0 8px;
-      color: var(--cyan3);
+      padding: 32px 16px;
+      font-size: 15px;
       font-weight: 500;
+      line-height: 1.6;
+      border-radius: 10px;
     }
+    .form-feedback.success {
+      color: var(--cyan3);
+      background: rgba(6,182,212,0.08);
+      border: 1px solid rgba(6,182,212,0.2);
+    }
+    .form-feedback.error {
+      color: #fca5a5;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .form-feedback a { color: inherit; text-decoration: underline; }
 
     /* ─── FOOTER ───────────────────────────────────────────── */
     footer {
@@ -901,13 +914,11 @@
               <label for="message">Message</label>
               <textarea id="message" name="message" placeholder="Tell us about your project or what you need help with..." required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary form-submit">
+            <button type="submit" id="formSubmitBtn" class="btn btn-primary form-submit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               Send Message
             </button>
-            <div class="form-success" id="formSuccess">
-              Message sent! We'll be in touch within one business day.
-            </div>
+            <div class="form-feedback" id="formFeedback"></div>
           </form>
         </div>
 
@@ -964,6 +975,43 @@
     // Mark hero elements visible immediately on load
     document.querySelectorAll('#hero .reveal').forEach(el => {
       setTimeout(() => el.classList.add('visible'), 100);
+    });
+
+    // ── Contact form — AJAX submission via fetch
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const form     = this;
+      const btn      = document.getElementById('formSubmitBtn');
+      const feedback = document.getElementById('formFeedback');
+
+      btn.disabled = true;
+      btn.innerHTML = 'Sending&hellip;';
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          // Hide all form fields and the button, show success
+          Array.from(form.elements).forEach(el => el.closest('.form-group') && (el.closest('.form-group').style.display = 'none'));
+          btn.style.display = 'none';
+          feedback.className = 'form-feedback success';
+          feedback.textContent = "Message sent! We'll be in touch within one business day.";
+          feedback.style.display = 'block';
+        } else {
+          throw new Error('non-ok');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message';
+        feedback.className = 'form-feedback error';
+        feedback.innerHTML = 'Something went wrong. Please email us directly at <a href="mailto:info@certivonit.ca">info@certivonit.ca</a>';
+        feedback.style.display = 'block';
+      }
     });
 
   </script>
